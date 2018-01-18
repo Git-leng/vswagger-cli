@@ -1,0 +1,101 @@
+#!/usr/bin/env node
+
+var _ = require('lodash');
+var fs = require('fs');
+var path = require('path');
+var program = require('commander');
+var chalk = require('chalk');
+var ora = require('ora');
+var home = require('user-home');
+var rimraf = require('rimraf');
+var tildify = require('tildify');
+var download = require('download-git-repo');
+
+var logger = require('../lib/logger');
+var generate = require('../lib/generate');
+var localPath = require('../lib/local-path');
+var checkVersion = require('../lib/check-version');
+
+var isLocalPath = localPath.isLocalPath;
+var getTemplatePath = localPath.getTemplatePath;
+
+/**
+ * Usage.
+ */
+
+program
+  .usage('[project-path]')
+  .option('-c, --clone', '使用 git clone')
+  .option('--offline', '使用缓存模板')
+  .parse(process.argv)
+
+run()
+
+function run() {
+    var fileName = '.vswagger.js';
+    var projectPath = program.args[0] ? path.resolve(process.cwd(), program.args[0]) : process.cwd();
+    var configPath = path.join(projectPath, fileName);
+
+    if (!fs.existsSync(configPath)) {
+        logger.fatal('找不到 '+ fileName +' 配置文件');
+    }
+
+    var config = require(configPath);
+
+    var template = config.template || 'vue-swagger-template';
+    var hasSlash = template.indexOf('/') > -1;
+
+    var tmp = path.join(home, '.vue-swagger', template.replace(/\//g, '-'));
+
+    if (program.offline) {
+        logger.log('使用缓存模板 %s', chalk.yellow(tildify(tmp)));
+        template = tmp;
+    }
+
+    // check if template is local
+    if (isLocalPath(template)) {
+        var templatePath = getTemplatePath(template, projectPath);
+        if (fs.existsSync(templatePath)) {
+            generate(projectPath, templatePath, config, generateDone);
+        } else {
+            logger.fatal('找不到本地模板 "%s".', template);
+        }
+    } else {
+        checkVersion(() => {
+            if (!hasSlash) {
+                // use official templates
+                var officialTemplate = 'Git-leng/' + template;
+                downloadAndGenerate(officialTemplate, tmp, projectPath, config);
+            } else {
+                downloadAndGenerate(template, tmp, projectPath, config);
+            }
+        });
+    }
+}
+
+/**
+ * Download a generate from a template repo.
+ *
+ * @param {String} template
+ */
+
+function downloadAndGenerate (template, tmp, projectPath, config) {
+    var spinner = ora('正在下载模板.');
+    spinner.start();
+    // Remove if local template exists
+    if (fs.existsSync(tmp)) rimraf.sync(tmp);
+    download(template, tmp, {
+        clone: program.clone || false
+    }, function (err) {
+        spinner.stop();
+        if (err) logger.fatal('模板下载失败 ' + template + ': ' + err.message.trim());
+        generate(projectPath, tmp, config, generateDone);
+    });
+}
+
+function generateDone (error, files) {
+    if (error) logger.fatal(error);
+    _.forEach(files, (file) => {
+        logger.success(chalk.green('%s'), tildify(file));
+    });
+}

@@ -1,0 +1,6 @@
+#!/usr/bin/env node
+require('commander')
+    .version(require('../package').version)
+    .usage('<command> [options]')
+    .command('init', '根据 ".vswagger" 创建接口模板')
+    .parse(process.argv)
