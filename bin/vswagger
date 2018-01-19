@@ -2,5 +2,6 @@
 require('commander')
     .version(require('../package').version)
     .usage('<command> [options]')
-    .command('init', '根据 ".vswagger" 创建接口模板')
+    .command('init', 'generate a new API from a template')
+    .command('clean', 'clean it!')
     .parse(process.argv)

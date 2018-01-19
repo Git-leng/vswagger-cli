@@ -1,0 +1,177 @@
+#!/usr/bin/env node
+
+var _ = require('lodash');
+var fs = require('fs');
+let os = require('os');
+var path = require('path');
+var program = require('commander');
+var chalk = require('chalk');
+var ora = require('ora');
+var home = require('user-home');
+var rimraf = require('rimraf');
+var tildify = require('tildify');
+var download = require('download-git-repo');
+
+var logger = require('../lib/logger');
+var cache = {};
+
+
+program
+  .usage('[project-path]')
+  .parse(process.argv);
+
+run();
+
+function run() {
+    var fileName = '.vswagger.js';
+    var projectPath = program.args[0] ? path.resolve(process.cwd(), program.args[0]) : process.cwd();
+    var configPath = path.join(projectPath, fileName);
+
+    if (!fs.existsSync(configPath)) {
+        logger.fatal('找不到 '+ fileName +' 配置文件');
+    }
+
+    var config = require(configPath);
+    var projectDir = config.projectDir || 'src';
+    var suffix = _.isEmpty(config.suffix) ? [] : config.suffix;
+
+    __findFile(projectDir, suffix, config);
+
+    Object.keys(cache).forEach(project => {
+        cache[project] = _.uniq(cache[project]).map(item => {
+            return item.split('.')[2];
+        });
+
+        if (!_.isEmpty(cache[project])) {
+            __handleAPIFile(project, config);
+        }
+    });
+}
+
+function __findFile(dir, suffix, config) {
+    var files = fs.readdirSync(dir);
+
+    _.forEach(files, file => {
+        let filePath = path.normalize(dir + '/' + file);
+        let stat = fs.statSync(filePath);
+
+        if (stat && stat.isDirectory()) {
+            if (filePath. indexOf(config.output) === -1) {
+                __findFile(filePath + '/', suffix, config);
+            }
+        } else {
+            if (_.isEmpty(suffix)) {
+                    __readFile(filePath, config);
+            } else {
+                if (suffix.indexOf(path.extname(filePath)) !== -1) {
+                    __readFile(filePath, config);
+                }
+            }
+        }
+    });
+}
+
+function __readFile(dir, config) {
+    let str = fs.readFileSync(dir, {encoding: 'utf8'});
+    _.forEach(config.projects, item => {
+        let regex = new RegExp("\\w+(\\." + item.modelName + "\\.)\\w+","gi");
+        let arr = str.match(regex);
+
+        if (arr) {
+            cache[item.modelName] = (cache[item.modelName] || []).concat(arr);
+        }
+    });
+}
+
+function __handleAPIFile(project, config) {
+    var filePath = config.output + '/' + project + '/index.js';
+    let file = fs.readFileSync(filePath, 'utf8');
+    let lines = file.split("\n");
+    let i = 0;
+    let step = 10;
+    let newLineArr = [];
+    let matchArr = [];
+
+    var get_line = (begin, end) => {
+        var arr = [];
+        var flag = false;
+
+        for (let j = begin; j < end; j++) {
+            if (i === lines.length - 1) {
+                return ;
+            } else {
+                arr.push(lines[j]);
+
+                cache[project].forEach(item => {
+                    if (new RegExp("function " + item + " ","g").test(lines[j])) {
+                        matchArr.push(item);
+                        flag = true;
+                    }
+                });
+
+                if (lines[j] === '') {
+                    i = j + 1;
+                    break;
+                }
+            }
+            i = j + 1;
+        }
+
+        if (flag || begin === 0) {
+            newLineArr = newLineArr.concat(arr);
+        }
+
+        get_line(i, i + step);
+    };
+
+    get_line(i, i + step);
+
+    __checkAPI(matchArr, project, config);
+
+     __write(newLineArr, matchArr, filePath, project);
+
+    // 清空缓存
+    lines = null;
+    newLineArr = null;
+}
+
+function __checkAPI(arr, project, config) {
+    if (arr.length !== cache[project].length) {
+        console.log();
+        var longArr = arr.length < cache[project].length ? cache[project] : arr;
+        var shortArr = arr.length < cache[project].length ? arr : cache[project];
+
+        logger.log(chalk.yellow(config.output + '/' + project + '/index.js 文件里, 没有找到以下方法:'));
+
+        longArr.forEach(item => {
+            if (shortArr.indexOf(item) === -1) {
+                logger.log(item);
+            }
+        });
+        console.log();
+    }
+}
+
+function __write(arr, matchArr, filePath, project) {
+    if (!_.isEmpty(arr)) {
+        var fWrite = fs.createWriteStream(filePath, {flags: 'w', encoding: 'utf8', autoClose: true}); 
+
+        arr.push('export {');
+
+        matchArr.forEach((item, i) => {
+            var line = cache[project].length - 1 === i ? "    " + item : "    " + item + ",";
+            arr.push(line);
+        });
+
+        arr.push('};');
+
+        arr.forEach(item => {
+            fWrite.write(item + os.EOL);
+        });
+
+        logger.success(chalk.green(filePath));
+
+        fWrite = null;
+        arr = null;
+    }
+}

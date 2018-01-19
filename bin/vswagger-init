@@ -27,9 +27,9 @@ program
   .usage('[project-path]')
   .option('-c, --clone', '使用 git clone')
   .option('--offline', '使用缓存模板')
-  .parse(process.argv)
+  .parse(process.argv);
 
-run()
+run();
 
 function run() {
     var fileName = '.vswagger.js';
