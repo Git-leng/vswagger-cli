@@ -1,2 +1,2 @@
-# vue-swagger
-vue对接服务端swagger接口，　自动生成模块化接口
+# vswagger
+vue接口自动化
