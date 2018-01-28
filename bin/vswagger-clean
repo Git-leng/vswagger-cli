@@ -32,7 +32,7 @@ function run() {
     }
 
     var config = require(configPath);
-    var projectDir = config.projectDir || 'src';
+    var projectDir = path.join(projectPath, config.projectDir || 'src');
     var suffix = _.isEmpty(config.suffix) ? [] : config.suffix;
 
     __findFile(projectDir, suffix, config);
@@ -43,7 +43,7 @@ function run() {
         });
 
         if (!_.isEmpty(cache[project])) {
-            __handleAPIFile(project, config);
+            __handleAPIFile(project, projectPath,  config);
         }
     });
 }
@@ -83,8 +83,8 @@ function __readFile(dir, config) {
     });
 }
 
-function __handleAPIFile(project, config) {
-    var filePath = config.output + '/' + project + '/index.js';
+function __handleAPIFile(project, projectPath, config) {
+    var filePath = projectPath + '/' + config.output + '/' + project + '/index.js';
     let file = fs.readFileSync(filePath, 'utf8');
     let lines = file.split("\n");
     let i = 0;
@@ -154,12 +154,12 @@ function __checkAPI(arr, project, config) {
 
 function __write(arr, matchArr, filePath, project) {
     if (!_.isEmpty(arr)) {
-        var fWrite = fs.createWriteStream(filePath, {flags: 'w', encoding: 'utf8', autoClose: true}); 
+        var fWrite = fs.createWriteStream(filePath, {flags: 'w', encoding: 'utf8', autoClose: true});
 
         arr.push('export {');
 
         matchArr.forEach((item, i) => {
-            var line = cache[project].length - 1 === i ? "    " + item : "    " + item + ",";
+            var line = matchArr.length - 1 === i ? "    " + item : "    " + item + ",";
             arr.push(line);
         });
 

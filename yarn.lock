@@ -143,7 +143,7 @@ co@3.1.0, co@~3.1.0:
   version "3.1.0"
   resolved "http://registry.npm.souche-inc.com/co/download/co-3.1.0.tgz#4ea54ea5a08938153185e15210c68d9092bc1b78"
 
-coffee-script@^1.12.4:
+coffee-script@^1.12.4, coffee-script@^1.12.7:
   version "1.12.7"
   resolved "http://registry.npm.souche-inc.com/coffee-script/download/coffee-script-1.12.7.tgz#c05dae0cb79591d05b3070a8433a98c9a89ccc53"
 
@@ -700,6 +700,10 @@ seek-bzip@^1.0.5:
   resolved "http://registry.npm.souche-inc.com/seek-bzip/download/seek-bzip-1.0.5.tgz#cfe917cb3d274bcffac792758af53173eb1fabdc"
   dependencies:
     commander "~2.8.1"
+
+semver@^5.5.0:
+  version "5.5.0"
+  resolved "http://registry.npm.souche-inc.com/semver/download/semver-5.5.0.tgz#dc4bbc7a6ca9d916dee5d43516f0092b58f7b8ab"
 
 signal-exit@^3.0.2:
   version "3.0.2"
