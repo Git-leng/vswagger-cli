@@ -25,6 +25,7 @@ var getTemplatePath = localPath.getTemplatePath;
 
 program
   .usage('[project-path]')
+  .usage('[project-name]')
   .option('-c, --clone', '使用 git clone')
   .option('--offline', '使用缓存模板')
   .parse(process.argv);
@@ -41,6 +42,19 @@ function run() {
     }
 
     var config = require(configPath);
+    var projectName = program.args[1];
+
+    if (projectName) {
+        config.projects = _.filter(config.projects, item => {
+            if (projectName.split(',').indexOf(item.modelName) !== -1) {
+                return {
+                    token: item.token || '',
+                    modelName: item.modelName || '',
+                    docUrl: item.docUrl || []
+                };
+            }
+        });
+    }
 
     var template = config.template || 'vue-swagger-template';
     var hasSlash = template.indexOf('/') > -1;
