@@ -1,6 +1,6 @@
 # vswagger [![npm package](https://img.shields.io/npm/v/vue-cli.svg)](https://www.npmjs.com/package/vswagger-cli)
 
-自动生成模块化api接口文件，方便调用、接口管理
+自动生成模块化api接口文件，方便调用，接口管理
 
 * ### Installation
 > Prerequisites: [Node.js](https://nodejs.org/en/) (>=6.x, 8.x preferred), npm version 3+ and [Git](https://git-scm.com/).
@@ -58,7 +58,13 @@
 > vswagger init
 > ```
 
-> 4. 项目结束后开始清理无用的接口
+> 4. 只更新/生成某个模块的接口
+> ```
+> vswagger init 项目目录(.vswagger.js目录) 模块名称(a模块,b模块,c模块)
+> vswagger init ./ a
+> ```
+
+> 5. 项目结束后开始清理无用的接口
 > ```
 > vswagger clean
 > ```
@@ -88,7 +94,4 @@
 > ### 打包时会检查接口是否有遗漏（如果有遗漏会给出提示）
 >
 >![清理接口接口遗漏](https://sfault-image.b0.upaiyun.com/429/204/4292043823-5a7132688f6f1_articlex)
-
-
-
 
