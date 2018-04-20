@@ -103,7 +103,7 @@ function __handleAPIFile(project, projectPath, config) {
                 arr.push(lines[j]);
 
                 cache[project].forEach(item => {
-                    if (new RegExp("function " + item + " ","g").test(lines[j])) {
+                    if (new RegExp("function " + item, "g").test(lines[j])) {
                         matchArr.push(item);
                         flag = true;
                     }
@@ -126,6 +126,8 @@ function __handleAPIFile(project, projectPath, config) {
 
     get_line(i, i + step);
 
+     matchArr = _.uniq(matchArr)
+
     __checkAPI(matchArr, project, config);
 
      __write(newLineArr, matchArr, filePath, project);
@@ -137,18 +139,22 @@ function __handleAPIFile(project, projectPath, config) {
 
 function __checkAPI(arr, project, config) {
     if (arr.length !== cache[project].length) {
-        console.log();
         var longArr = arr.length < cache[project].length ? cache[project] : arr;
         var shortArr = arr.length < cache[project].length ? arr : cache[project];
-
-        logger.log(chalk.yellow(config.output + '/' + project + '/index.js 文件里, 没有找到以下方法:'));
+        var lose = [];
 
         longArr.forEach(item => {
             if (shortArr.indexOf(item) === -1) {
-                logger.log(item);
+                lose.push(item);
             }
         });
-        console.log();
+
+        if (lose.length !== 0) {
+            logger.log(chalk.yellow(config.output + '/' + project + '/index.js 文件里, 没有找到以下方法:'));
+            lose.forEach(item => {
+                logger.log(item);
+            });
+        }
     }
 }
 
