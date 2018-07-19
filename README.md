@@ -1,6 +1,5 @@
 # vswagger [![npm package](https://img.shields.io/npm/v/vue-cli.svg)](https://www.npmjs.com/package/vswagger-cli)
-
-自动生成模块化api接口文件，方便调用，接口管理
+vswagger是一个基于 swagger 快速生成 API 调用文件的命令行工具
 
 * ### Installation
 > Prerequisites: [Node.js](https://nodejs.org/en/) (>=6.x, 8.x preferred), npm version 3+ and [Git](https://git-scm.com/).
@@ -37,7 +36,8 @@
 >
 > module.exports = {
 >     template: '', // 可为空使用默认接口生成模板
->     output: "src/api", // 输出api目录
+>     safe: true, // 是否生成保护数据
+>     output: "src/api", // 输出到api目录
 >     projectDir: "src", // 代码存放目录(可不配置默认为src路径)
 >     suffix: [".js",".vue"], // 指定查询的文件(可不配置，默认.js,.vue文件)
 >     projects: [{
@@ -69,6 +69,11 @@
 > vswagger clean
 > ```
 
+> 6. 新增接口保护功能
+> ```
+> 通过safe开启
+> ```
+
 ## 直接上图看效果
 >
 > ### 生成的目录
@@ -77,11 +82,11 @@
 >>  `instance.js` 文件是配置 **开发/预发/线上** 接口访问的域名
 >>  `util.js` 文件是工具方法
 >
->![模块化结构](https://sfault-image.b0.upaiyun.com/127/639/127639242-5a712cbb821e9_articlex)
+>![ 模块化结构](https://sfault-image.b0.upaiyun.com/127/639/127639242-5a712cbb821e9_articlex)
 >
 > ### 生成接口结构
 >
->![接口结构](https://sfault-image.b0.upaiyun.com/841/758/841758257-5a712ead160f2_articlex)
+>![ 接口结构](https://sfault-image.b0.upaiyun.com/841/758/841758257-5a712ead160f2_articlex)
 >
 > ### 配置接口访问的域名
 >
@@ -89,9 +94,9 @@
 >
 > ### 使用接口
 >
->![调用接口](https://sfault-image.b0.upaiyun.com/315/393/3153930385-5a71310b6567d_articlex)
+> ![调用接口](https://sfault-image.b0.upaiyun.com/315/393/3153930385-5a71310b6567d_articlex)
 >
 > ### 打包时会检查接口是否有遗漏（如果有遗漏会给出提示）
 >
->![清理接口接口遗漏](https://sfault-image.b0.upaiyun.com/429/204/4292043823-5a7132688f6f1_articlex)
+>![ 清理接口接口遗漏](https://sfault-image.b0.upaiyun.com/429/204/4292043823-5a7132688f6f1_articlex)
 

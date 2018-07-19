@@ -26,9 +26,6 @@
     "tildify": "^1.2.0",
     "user-home": "^2.0.0"
   },
-  "devDependencies": {
-    "coffee-script": "^1.12.7"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Git-leng/vswagger-cli.git"

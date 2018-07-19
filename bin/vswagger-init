@@ -31,10 +31,11 @@ program
   .parse(process.argv);
 
 run();
+var projectPath;
 
 function run() {
     var fileName = '.vswagger.js';
-    var projectPath = program.args[0] ? path.resolve(process.cwd(), program.args[0]) : process.cwd();
+    projectPath = program.args[0] ? path.resolve(process.cwd(), program.args[0]) : process.cwd();
     var configPath = path.join(projectPath, fileName);
 
     if (!fs.existsSync(configPath)) {
@@ -43,6 +44,16 @@ function run() {
 
     var config = require(configPath);
     var projectName = program.args[1];
+    config['baseType'] = _.assign({
+        'Timestamp': '',
+        'string': '',
+        'boolean': false,
+        'integer': '',
+        'object': {},
+        'JSONObject': {},
+        'number': '',
+        'array': []
+    }, config.baseType);
 
     if (projectName) {
         config.projects = _.filter(config.projects, item => {
@@ -110,6 +121,6 @@ function downloadAndGenerate (template, tmp, projectPath, config) {
 function generateDone (error, files) {
     if (error) logger.fatal(error);
     _.forEach(files, (file) => {
-        logger.success(chalk.green('%s'), tildify(file));
+        logger.success(chalk.green('%s'), path.relative(projectPath, tildify(file)));
     });
 }
