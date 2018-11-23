@@ -22,9 +22,11 @@ program
 
 run();
 
+var projectPath;
+
 function run() {
     var fileName = '.vswagger.js';
-    var projectPath = program.args[0] ? path.resolve(process.cwd(), program.args[0]) : process.cwd();
+    projectPath = program.args[0] ? path.resolve(process.cwd(), program.args[0]) : process.cwd();
     var configPath = path.join(projectPath, fileName);
 
     if (!fs.existsSync(configPath)) {
@@ -130,7 +132,7 @@ function __handleAPIFile(project, projectPath, config) {
 
     __checkAPI(matchArr, project, config);
 
-     __write(newLineArr, matchArr, filePath, project);
+    __write(newLineArr, matchArr, filePath, project);
 
     // 清空缓存
     lines = null;
@@ -162,20 +164,20 @@ function __write(arr, matchArr, filePath, project) {
     if (!_.isEmpty(arr)) {
         var fWrite = fs.createWriteStream(filePath, {flags: 'w', encoding: 'utf8', autoClose: true});
 
-        arr.push('export {');
+        /* arr.push('export {');
 
         matchArr.forEach((item, i) => {
             var line = matchArr.length - 1 === i ? "    " + item : "    " + item + ",";
             arr.push(line);
         });
 
-        arr.push('};');
+        arr.push('};'); */
 
         arr.forEach(item => {
             fWrite.write(item + os.EOL);
         });
 
-        logger.success(chalk.green(filePath));
+        logger.success(chalk.green('%s'), path.relative(projectPath, tildify(filePath)));
 
         fWrite = null;
         arr = null;
