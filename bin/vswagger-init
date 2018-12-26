@@ -121,6 +121,6 @@ function downloadAndGenerate (template, tmp, projectPath, config) {
 function generateDone (error, files) {
     if (error) logger.fatal(error);
     _.forEach(files, (file) => {
-        logger.success(chalk.green('%s'), path.relative(projectPath, tildify(file)));
+        logger.success(chalk.green('%s'), '更新成功   ', `${path.relative(projectPath, tildify(file))}`);
     });
 }
