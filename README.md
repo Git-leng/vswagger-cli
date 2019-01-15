@@ -1,5 +1,5 @@
 # vswagger [![npm package](https://img.shields.io/npm/v/vue-cli.svg)](https://www.npmjs.com/package/vswagger-cli)
-vswagger是一个基于 swagger 快速生成 API 调用文件的命令行工具
+vswagger是一个基于 swagger 快速生成 API 调用文件的命令行工具, 主要功能将接口同步到本地文件
 
 * ### Installation
 > Prerequisites: [Node.js](https://nodejs.org/en/) (>=6.x, 8.x preferred), npm version 3+ and [Git](https://git-scm.com/).
