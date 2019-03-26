@@ -36,6 +36,7 @@ vswagger是一个基于 swagger 快速生成 API 调用文件的命令行工具,
 >
 > module.exports = {
 >     template: '', // 可为空使用默认接口生成模板
+>     generateType: 'souche', // 默认不要写
 >     safe: true, // 是否生成保护数据
 >     output: "src/api", // 输出到api目录
 >     projectDir: "src", // 代码存放目录(可不配置默认为src路径)
