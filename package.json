@@ -1,6 +1,6 @@
 {
   "name": "vswagger-cli",
-  "version": "1.1.4",
+  "version": "1.1.8",
   "description": "vue接口自动化",
   "main": "index.js",
   "bin": {
