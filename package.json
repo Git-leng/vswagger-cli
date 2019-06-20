@@ -6,7 +6,8 @@
   "bin": {
     "vswagger": "bin/vswagger",
     "vswagger-init": "bin/vswagger-init",
-    "vswagger-clean": "bin/vswagger-clean"
+    "vswagger-clean": "bin/vswagger-clean",
+    "vswagger-check": "bin/vswagger-check"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

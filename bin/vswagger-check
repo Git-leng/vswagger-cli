@@ -1,0 +1,138 @@
+#!/usr/bin/env node
+
+const path = require('path');
+const chalk = require('chalk');
+const fs = require('fs');
+const program = require('commander');
+
+const projectPath = process.cwd();
+const apiPath = 'src/api'; // api 文件路径
+const fileList = []; // api 下所有定义接口文件
+let apiFunctionList = []; // 所有接口方法集合
+const seekFileList = []; // src 下所有文件
+const noUseApi = []; // 所有没有被使用过的API
+
+program
+  .usage('[project-path]')
+  .parse(process.argv);
+
+run();
+
+function run() {
+    console.log('projectPath', projectPath);
+    console.log(chalk.green('开始检查， 请等待...'));
+    __findFile(path.join(projectPath, apiPath), fileList);
+    __readFile(fileList);
+    __handleApiFile();
+    __outputResult();
+}
+
+// 结果输出
+function __outputResult() {
+    if (!noUseApi.length) {
+        console.log(chalk.green('项目中暂无冗余接口'));
+        return;
+    }
+    const resultList = [];
+    noUseApi.map(item => {
+        // [{filePath: '', list: []}]
+        const fileRelaPath = item.filePath.substr(projectPath.length);
+        const functionName = item.functionName.trim();
+        let matchFileIndex = -1;
+        resultList.forEach((resultItem, index) => {
+            const isMatchFile = resultItem.filePath.indexOf(fileRelaPath);
+            if (isMatchFile > -1) {
+                matchFileIndex = index;
+                return;
+            }
+        });
+        if (matchFileIndex < 0) {
+            const resultItem = {
+                filePath: fileRelaPath,
+                list: [functionName]
+            };
+            resultList.push(resultItem);
+        } else {
+            resultList[matchFileIndex].list.push(functionName);
+        }
+    });
+    console.log(chalk.red('项目中存在以下冗余接口:'), '\n');
+    resultList.map(item => {
+        console.log(chalk.yellow(item.filePath + ':'));
+        item.list.map(listItem => {
+            console.log(chalk.red(listItem));
+        });
+        console.log('\n \n');
+    });
+}
+
+// 读取文件内容, 收集文件中的所有接口
+function __readFile(apiFileList) {
+    apiFileList.forEach(item => {
+        let file = fs.readFileSync(item.filePath, {encoding: 'utf8'});
+        let lines = file.split('\n');
+        for (let j = 0; j < lines.length; j +=1) {
+            const functions = lines[j].match(/export function\s*([^(]*)\(/);
+            let name;
+            if (functions) {
+                name = functions[1];
+                apiFunctionList.push({
+                    fileName: item.fileName,
+                    filePath: item.filePath,
+                    functionName: name,
+                    line: j
+                });
+            }
+        }
+    });
+}
+
+// 读取api 所在文件夹下的所有接口文件
+function __findFile(dir, cache) {
+    if (!fs.existsSync(dir)) {
+        console.log(chalk.red('项目中不存在/src/api目录'));
+        process.exit(1);
+    }
+    const files = fs.readdirSync(dir);
+    files.forEach(file => {
+        const filePath = path.normalize(dir + '/' + file);
+        const stat = fs.statSync(filePath);
+        if (stat && stat.isDirectory()) {
+            __findFile(filePath, cache);
+        } else {
+            cache.push({
+                filePath,
+                fileName: file
+            });
+        }
+    });
+}
+
+// 查找接口在src 文件夹下是否被多次使用
+function __handleApiFile() {
+    const seekPath = 'src';
+    __findFile(path.join(projectPath, seekPath), seekFileList);
+    __matchApi(seekFileList);
+}
+
+function __matchApi(fileList) {
+    apiFunctionList.forEach(functionItem => {
+        let hasUsed = false;
+        for(let i = 0; i < fileList.length; i += 1) {
+            if (fileList[i].filePath.indexOf(apiPath) > -1) continue; // 'src/api'文件夹下无需查找匹配
+            let file = fs.readFileSync(fileList[i].filePath, {encoding: 'utf8'});
+            let lines = file.split('\n');
+            for (let j = 0; j < lines.length; j +=1) {
+                if (!lines[j]) continue; // 当前行如果为空，则匹配下一行
+                const matchIndex = lines[j].indexOf(functionItem.functionName.trim());
+                if (matchIndex > -1) { // 只要被查找到，则被使用过
+                    hasUsed = true;
+                    return;
+                }
+            }
+        }
+        if (!hasUsed) {
+            noUseApi.push(functionItem);
+        }
+    });
+}
