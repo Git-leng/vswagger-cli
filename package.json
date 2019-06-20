@@ -1,6 +1,6 @@
 {
   "name": "vswagger-cli",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "vue接口自动化",
   "main": "index.js",
   "bin": {
@@ -15,7 +15,7 @@
   "author": "leng",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.17.1",
+    "axios": "^0.19.0",
     "chalk": "^2.3.0",
     "commander": "^2.12.2",
     "download-git-repo": "^1.0.1",
