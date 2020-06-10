@@ -88,21 +88,17 @@ vswagger是一个基于 swagger 快速生成 API 调用文件的命令行工具,
 >>  `instance.js` 文件是配置 **开发/预发/线上** 接口访问的域名
 >>  `util.js` 文件是工具方法
 >
->![ 模块化结构](https://sfault-image.b0.upaiyun.com/127/639/127639242-5a712cbb821e9_articlex)
+>![ 模块化结构](http://img.souche.com/f2e/0bff8842e501170d9438c808d0b1ca31.jpg)
 >
 > ### 生成接口结构
 >
->![ 接口结构](https://sfault-image.b0.upaiyun.com/841/758/841758257-5a712ead160f2_articlex)
+>![ 接口结构](http://img.souche.com/f2e/f992480ebdbe4e9b658dfa23789fcf75.jpg)
 >
 > ### 配置接口访问的域名
 >
-> ![接口域名配置](https://sfault-image.b0.upaiyun.com/425/228/4252281888-5a7145bd6aebb_articlex)
->
-> ### 使用接口
->
-> ![调用接口](https://sfault-image.b0.upaiyun.com/315/393/3153930385-5a71310b6567d_articlex)
+> ![调用接口](http://img.souche.com/f2e/e6f71d290ad74e49d16044747cb178f5.jpg)
 >
 > ### 打包时会检查接口是否有遗漏（如果有遗漏会给出提示）
 >
->![ 清理接口接口遗漏](https://sfault-image.b0.upaiyun.com/429/204/4292043823-5a7132688f6f1_articlex)
+>![ 清理接口接口遗漏](http://img.souche.com/f2e/534d2efa951f3342a200ac89cd9de3c2.jpg)
 
