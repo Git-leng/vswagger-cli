@@ -42,10 +42,14 @@ vswagger是一个基于 swagger 快速生成 API 调用文件的命令行工具,
 >     projectDir: "src", // 代码存放目录(可不配置默认为src路径)
 >     suffix: [".js",".vue"], // 指定查询的文件(可不配置，默认.js,.vue文件)
 >     projects: [{
+>         version: '2.x', 
+>         domain: 'TEST', // 环境变量
 >         token: '值', // swagger令牌
 >         modelName: "demo1", // 模块化名称
 >         docUrl: ['api-docs', 'api-docs', 'api-docs', 'api-docs']  // swagger base-url
 >     }, {
+>         version: '1.x', 
+>         domain: 'TEST', // 环境变量
 >         token: '值', // swagger令牌
 >         modelName: 'demo2',
 >         docUrl: ['api-docs'] // 多个
@@ -79,6 +83,8 @@ vswagger是一个基于 swagger 快速生成 API 调用文件的命令行工具,
 > ```
 > vswagger check
 > ```
+
+> 8.支持2.x版本数据结构解析处理
 
 ## 直接上图看效果
 >
