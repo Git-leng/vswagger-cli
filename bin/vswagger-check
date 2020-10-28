@@ -5,12 +5,13 @@ const chalk = require('chalk');
 const fs = require('fs');
 const program = require('commander');
 
-const projectPath = process.cwd();
-const apiPath = 'src/api'; // api 文件路径
+var projectPath = './';
+var apiPath = 'src/api'; // api 文件路径
 const fileList = []; // api 下所有定义接口文件
 let apiFunctionList = []; // 所有接口方法集合
 const seekFileList = []; // src 下所有文件
 const noUseApi = []; // 所有没有被使用过的API
+const fileName = '.vswagger.js';
 
 program
   .usage('[project-path]')
@@ -19,7 +20,10 @@ program
 run();
 
 function run() {
-    console.log('projectPath', projectPath);
+    projectPath = program.args[0] ? path.resolve(process.cwd(), program.args[0]) : process.cwd();
+    var configPath = path.join(projectPath, fileName);
+    var config = require(configPath);
+    apiPath = config.output;
     console.log(chalk.green('开始检查， 请等待...'));
     __findFile(path.join(projectPath, apiPath), fileList);
     __readFile(fileList);
@@ -90,7 +94,7 @@ function __readFile(apiFileList) {
 // 读取api 所在文件夹下的所有接口文件
 function __findFile(dir, cache) {
     if (!fs.existsSync(dir)) {
-        console.log(chalk.red('项目中不存在/src/api目录'));
+        console.log(chalk.red(`项目中不存在${dir}目录`));
         process.exit(1);
     }
     const files = fs.readdirSync(dir);
@@ -119,7 +123,7 @@ function __matchApi(fileList) {
     apiFunctionList.forEach(functionItem => {
         let hasUsed = false;
         for(let i = 0; i < fileList.length; i += 1) {
-            if (fileList[i].filePath.indexOf(apiPath) > -1) continue; // 'src/api'文件夹下无需查找匹配
+            if (fileList[i].filePath.indexOf(path.normalize(apiPath)) > -1) continue; // 'src/api'文件夹下无需查找匹配
             let file = fs.readFileSync(fileList[i].filePath, {encoding: 'utf8'});
             let lines = file.split('\n');
             for (let j = 0; j < lines.length; j +=1) {

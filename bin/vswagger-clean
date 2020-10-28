@@ -18,6 +18,7 @@ var cache = {};
 
 program
   .usage('[project-path]')
+  .usage('[project-name]')
   .parse(process.argv);
 
 run();
@@ -27,6 +28,7 @@ var projectPath;
 function run() {
     var fileName = '.vswagger.js';
     projectPath = program.args[0] ? path.resolve(process.cwd(), program.args[0]) : process.cwd();
+    var projectName = program.args[1];
     var configPath = path.join(projectPath, fileName);
 
     if (!fs.existsSync(configPath)) {
@@ -40,12 +42,14 @@ function run() {
     __findFile(projectDir, suffix, config);
 
     Object.keys(cache).forEach(project => {
-        cache[project] = _.uniq(cache[project]).map(item => {
-            return item.split('.')[2];
-        });
+        if (_.isEmpty(projectName) || project == projectName) {
+            cache[project] = _.uniq(cache[project]).map(item => {
+                return item.split('.')[2];
+            });
 
-        if (!_.isEmpty(cache[project])) {
-            __handleAPIFile(project, projectPath,  config);
+            if (!_.isEmpty(cache[project])) {
+                __handleAPIFile(project, projectPath,  config);
+            }
         }
     });
 }
@@ -76,11 +80,12 @@ function __findFile(dir, suffix, config) {
 function __readFile(dir, config) {
     let str = fs.readFileSync(dir, {encoding: 'utf8'});
     _.forEach(config.projects, item => {
-        let regex = new RegExp("\\w+(\\." + item.modelName + "\\.)\\w+","gi");
-        let arr = str.match(regex);
+        let regex = new RegExp("\\w+(\\s*?\\." + item.modelName + "\\s*?\\.)\\w+","gi");
+        // let regex = new RegExp("\\w+(\\." + item.modelName + "\\.)\\w+","gi");
 
+        let arr = str.match(regex);
         if (arr) {
-            cache[item.modelName] = (cache[item.modelName] || []).concat(arr);
+            cache[item.modelName] = (cache[item.modelName] || []).concat(arr.map(item => item.replace(/\s/g,'')));
         }
     });
 }
